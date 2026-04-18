@@ -1,6 +1,5 @@
 package com.jaugusto.StoryboardAI.service;
 
-
 import com.jaugusto.StoryboardAI.model.SceneModel;
 import com.jaugusto.StoryboardAI.model.StoryboardModel;
 import com.jaugusto.StoryboardAI.repository.SceneRepository;
@@ -11,18 +10,18 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class SceneService {
 
-    private static final int MAX_SCENES = 6;
+    private static final int MAX_SCENES_PER_STORYBOARD = 6;
 
     private final SceneRepository sceneRepository;
     private final StoryboardService storyboardService;
 
     public SceneModel addSceneToStoryboard(Long storyboardId, SceneModel scene) {
-        StoryboardModel storyboard = storyboardService.findById(storyboardId);
+        StoryboardModel storyboard = storyboardService.findStoryboardById(storyboardId);
         if (storyboard == null) {
             return null;
         }
 
-        if (storyboard.getScenes().size() >= MAX_SCENES) {
+        if (hasReachedSceneLimit(storyboard)) {
             return null;
         }
 
@@ -30,26 +29,30 @@ public class SceneService {
         return sceneRepository.save(scene);
     }
 
-    public SceneModel findById(Long id) {
+    public SceneModel findSceneById(Long id) {
         return sceneRepository.findById(id).orElse(null);
     }
 
-    public SceneModel update(Long id, SceneModel updated) {
-        SceneModel existing = findById(id);
-        if (existing == null) {
+    public SceneModel updateSceneContent(Long id, SceneModel updatedData) {
+        SceneModel existingScene = findSceneById(id);
+        if (existingScene == null) {
             return null;
         }
-        existing.setTitle(updated.getTitle());
-        existing.setDescription(updated.getDescription());
-        existing.setOrder(updated.getOrder());
-        return sceneRepository.save(existing);
+        existingScene.setTitle(updatedData.getTitle());
+        existingScene.setDescription(updatedData.getDescription());
+        existingScene.setOrder(updatedData.getOrder());
+        return sceneRepository.save(existingScene);
     }
 
-    public boolean delete(Long id) {
+    public boolean deleteSceneById(Long id) {
         if (!sceneRepository.existsById(id)) {
             return false;
         }
         sceneRepository.deleteById(id);
         return true;
+    }
+
+    private boolean hasReachedSceneLimit(StoryboardModel storyboard) {
+        return storyboard.getScenes().size() >= MAX_SCENES_PER_STORYBOARD;
     }
 }

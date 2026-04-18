@@ -13,28 +13,28 @@ public class StoryboardService {
 
     private final StoryboardRepository storyboardRepository;
 
-    public StoryboardModel create(StoryboardModel storyboard) {
+    public StoryboardModel createStoryboard(StoryboardModel storyboard) {
         return storyboardRepository.save(storyboard);
     }
 
-    public List<StoryboardModel> findAll() {
+    public List<StoryboardModel> findAllStoryboards() {
         return storyboardRepository.findAll();
     }
 
-    public StoryboardModel findById(Long id) {
+    public StoryboardModel findStoryboardById(Long id) {
         return storyboardRepository.findById(id).orElse(null);
     }
 
-    public StoryboardModel update(Long id, StoryboardModel updated) {
-        StoryboardModel existing = findById(id);
-        if (existing == null) {
+    public StoryboardModel updateStoryboardTitle(Long id, StoryboardModel updatedData) {
+        StoryboardModel existingStoryboard = findStoryboardById(id);
+        if (existingStoryboard == null) {
             return null;
         }
-        existing.setTitle(updated.getTitle());
-        return storyboardRepository.save(existing);
+        existingStoryboard.setTitle(updatedData.getTitle());
+        return storyboardRepository.save(existingStoryboard);
     }
 
-    public boolean delete(Long id) {
+    public boolean deleteStoryboardById(Long id) {
         if (!storyboardRepository.existsById(id)) {
             return false;
         }
